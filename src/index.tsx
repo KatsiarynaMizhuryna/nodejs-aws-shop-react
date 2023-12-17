@@ -10,14 +10,15 @@ import { theme } from "~/theme";
 import axios from "axios";
 
 axios.interceptors.response.use(
-  (response) => response,
+  (res) => res,
   (error) => {
-    if (error.response.status === 401 || error.response.status === 403) {
-      alert(
-        `Authorization error: ${error.response.status} - ${error.response.statusText}`
-      );
+    if (error.response.status === 401) {
+      alert(`Authorization error: ${error.response.status} Unauthorized`);
     }
-    return Promise.reject(error);
+
+    if (error.response.status === 403) {
+      alert(`Authorization error: ${error.response.status} Forbidden`);
+    }
   }
 );
 const queryClient = new QueryClient({
