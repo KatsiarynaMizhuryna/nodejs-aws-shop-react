@@ -15,7 +15,7 @@ export default function AddProductToCart({ product }: AddProductToCartProps) {
   const { mutate: upsertCart } = useUpsertCart();
   const invalidateCart = useInvalidateCart();
   const cartItem = data.find((i) => i.product.id === product.id);
-
+  console.log(cartItem);
   const addProduct = () => {
     upsertCart(
       { product, count: cartItem ? cartItem.count + 1 : 1 },
