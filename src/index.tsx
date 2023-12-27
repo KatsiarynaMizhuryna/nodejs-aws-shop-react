@@ -7,7 +7,20 @@ import { BrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 import { theme } from "~/theme";
+import axios from "axios";
 
+axios.interceptors.response.use(
+  (res) => res,
+  (error) => {
+    if (error.response.status === 401) {
+      alert(`Authorization error: ${error.response.status} Unauthorized`);
+    }
+
+    if (error.response.status === 403) {
+      alert(`Authorization error: ${error.response.status} Forbidden`);
+    }
+  }
+);
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: { refetchOnWindowFocus: false, retry: false, staleTime: Infinity },
