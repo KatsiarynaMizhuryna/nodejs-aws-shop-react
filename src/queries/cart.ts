@@ -5,6 +5,8 @@ import API_PATHS from "~/constants/apiPaths";
 import { CartItem } from "~/models/CartItem";
 
 interface CartMod {
+  statsCode: number;
+  message: string;
   data: {
     cart: {
       items: CartItem[];
