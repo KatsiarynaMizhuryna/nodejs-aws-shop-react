@@ -4,14 +4,25 @@ import { useQuery, useQueryClient, useMutation } from "react-query";
 import API_PATHS from "~/constants/apiPaths";
 import { CartItem } from "~/models/CartItem";
 
+interface CartMod {
+  statsCode: number;
+  message: string;
+  data: {
+    cart: {
+      items: CartItem[];
+      total: number;
+    };
+  };
+}
+
 export function useCart() {
   return useQuery<CartItem[], AxiosError>("cart", async () => {
-    const res = await axios.get<CartItem[]>(`${API_PATHS.cart}/profile/cart`, {
+    const res = await axios.get<CartMod>(`${API_PATHS.cart}/profile/cart`, {
       headers: {
         Authorization: `Basic ${localStorage.getItem("authorization_token")}`,
       },
     });
-    return res.data;
+    return res.data.data.cart.items;
   });
 }
 

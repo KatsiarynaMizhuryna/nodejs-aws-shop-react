@@ -35,40 +35,33 @@ export default function PageOrder() {
     {
       queryKey: ["order", { id }],
       queryFn: async () => {
-        const res = await axios.get<Order>(`${API_PATHS.order}/order/${id}`);
-        return res.data;
-      },
-    },
-    {
-      queryKey: "products",
-      queryFn: async () => {
-        const res = await axios.get<AvailableProduct[]>(
-          `${API_PATHS.bff}/product/available`
-        );
-        return res.data;
+        const res = await axios.get<Order>(`${API_PATHS.order}/order/${id}`, {
+          headers: {
+            Authorization: `Basic ${localStorage.getItem(
+              "authorization_token"
+            )}`,
+          },
+        });
+
+        // @ts-ignore
+        return res.data.data.order;
       },
     },
   ]);
-  const [
-    { data: order, isLoading: isOrderLoading },
-    { data: products, isLoading: isProductsLoading },
-  ] = results;
+  const [{ data: order, isLoading: isOrderLoading }] = results;
   const { mutateAsync: updateOrderStatus } = useUpdateOrderStatus();
   const invalidateOrder = useInvalidateOrder();
   const cartItems: CartItem[] = React.useMemo(() => {
-    if (order && products) {
-      return order.items.map((item: OrderItem) => {
-        const product = products.find((p) => p.id === item.productId);
-        if (!product) {
-          throw new Error("Product not found");
-        }
-        return { product, count: item.count };
+    if (order) {
+      // @ts-ignore
+      return order.items.map((item) => {
+        return { product: item.product, count: item.count };
       });
     }
     return [];
-  }, [order, products]);
+  }, [order]);
 
-  if (isOrderLoading || isProductsLoading) return <p>loading...</p>;
+  if (isOrderLoading) return <p>loading...</p>;
 
   const statusHistory = order?.statusHistory || [];
 
@@ -155,8 +148,9 @@ export default function PageOrder() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {statusHistory.map((statusHistoryItem) => (
-              <TableRow key={order.id}>
+            {/* @ts-ignore */}
+            {statusHistory.map((statusHistoryItem, key) => (
+              <TableRow key={`${order.id}-${key}`}>
                 <TableCell component="th" scope="row">
                   {statusHistoryItem.status.toUpperCase()}
                 </TableCell>
